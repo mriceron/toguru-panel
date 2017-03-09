@@ -3,7 +3,7 @@ const gutil = require('gulp-util')
 const browserify = require('browserify')
 const source = require('vinyl-source-stream')
 const babelify = require('babelify')
-const serve = require('gulp-serve')
+const webserver = require('gulp-webserver')
 
 gulp.task('build:es6', () => {
     return browserify({
@@ -35,9 +35,13 @@ gulp.task('watch', ['build:es6', 'build:statics'], () => {
     gulp.watch('./static/**/*', ['build:statics'])
 })
 
-gulp.task('serve', ['watch'], serve({
-  root: ['dist'],
-  port: 3000
-}))
+gulp.task('serve', ['watch'], () => {
+  gulp.src('dist')
+    .pipe(webserver({
+      livereload: true,
+      open: true,
+      fallback: 'index.html'
+    }))
+})
 
 gulp.task('default', ['serve'])
