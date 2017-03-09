@@ -3475,3 +3475,8 @@ body > .navbar-collapse[data-color="purple"]:after {
   float: right;
   width: 300px;
 }
+
+.displayed {
+  display: block;
+  background-color: rgba(0,0,0,0.3);
+}

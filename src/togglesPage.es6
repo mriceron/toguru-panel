@@ -63,8 +63,12 @@ const filterToggles = (query) => (toggle) => {
          isToggleTagsContainsQuery(toggle.tags, query)
 }
 
+const toTogglesList = state => {
+  return {toggles: objectToArray(state.toggles)}
+}
+
 export const TogglesPage =
-  connect(state => state)(
+  connect(toTogglesList)(
     React.createClass({
       getInitialState() {
         return {
