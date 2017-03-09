@@ -10,7 +10,9 @@ const defaultState = {
 const reducer = (state = defaultState, action) => {
   switch(action.type) {
     case SET_TOGGLES:
-      return Object.assign({}, state, action.toggles)
+      return Object.assign({}, state, {toggles: action.toggles})
+    default:
+      return state
   }
 }
 
