@@ -3480,3 +3480,7 @@ body > .navbar-collapse[data-color="purple"]:after {
   display: block;
   background-color: rgba(0,0,0,0.3);
 }
+
+label.error {
+  color: #FF4A55;
+}

@@ -6,12 +6,21 @@ import { arrayToObject } from './../utils.es6'
 const SET_TOGGLES = 'SET_TOGGLES'
 const SET_TOGGLE = 'SET_TOGGLE'
 const SET_API_KEY = 'SET_API_KEY'
+const DROP_TOGGLE = 'DROP_TOGGLE'
+const SET_AUDIT_LOG = 'SET_AUDIT_LOG'
 
 const API_KEY = 'API_KEY'
 
 const defaultState = {
   toggles: {},
+  auditLog: [],
   apiKey: localStorage.getItem(API_KEY)
+}
+
+const addToggleToState = (state, toggle) => {
+  const toggleObj = {}
+  toggleObj[toggle.id] = toggle
+  return Object.assign({}, state, {toggles: Object.assign({}, state.toggles, toggleObj)})
 }
 
 const reducer = (state = defaultState, action) => {
@@ -19,13 +28,23 @@ const reducer = (state = defaultState, action) => {
     case SET_TOGGLES:
       return Object.assign({}, state, {toggles: arrayToObject(action.toggles, "id")})
     case SET_TOGGLE:
-      return Object.assign({}, state, {toggles: Object.assign({}, state.toggles, action.toggle)})
+      return addToggleToState(state, action.toggle)
+    case DROP_TOGGLE:
+      const toggles = Object.assign({}, state.toggles)
+      delete toggles[action.toggleId]
+      return Object.assign({}, state, {toggles})
     case SET_API_KEY:
       localStorage.setItem(API_KEY, action.apiKey)
       return Object.assign({}, state, {apiKey: action.apiKey})
+    case SET_AUDIT_LOG:
+      return Object.assign({}, state, {auditLog: action.auditLog})
     default:
       return state
   }
+}
+
+export const setAuditLog = auditLog => {
+  return {type: SET_AUDIT_LOG, auditLog}
 }
 
 export const setApiKey = apiKey => {
@@ -38,6 +57,10 @@ export const setToggles = toggles => {
 
 export const setToggle = toggle => {
   return {type: SET_TOGGLE, toggle}
+}
+
+export const dropToggle = toggleId => {
+  return {type: DROP_TOGGLE, id: toggleId}
 }
 
 export const store = createStore(reducer, applyMiddleware(thunk))
