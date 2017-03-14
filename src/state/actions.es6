@@ -48,7 +48,7 @@ export const deleteToggle = toggleId => (dispatch, getState) =>
 export const updateToggle = toggle => dispatch => {
   if(!toggle.activations[0].rollout || !toggle.activations[0].rollout.percentage || toggle.activations[0].rollout.percentage == 0) {
     delete toggle.activations[0].rollout
-    return dispatch(updateToggleActivation(toggle)).then(dispatch(disableToggleActivation(toggle)))
+    return dispatch(disableToggleActivation(toggle)).then(dispatch(updateToggleActivation(toggle)))
   } else {
     return dispatch(updateToggleActivation(toggle))
   }

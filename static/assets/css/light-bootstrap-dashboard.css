@@ -3484,3 +3484,14 @@ body > .navbar-collapse[data-color="purple"]:after {
 label.error {
   color: #FF4A55;
 }
+
+.no-margin-bottom {
+  margin-bottom: 0px;
+}
+
+.black {
+  color: #333333;
+}
+.black:hover {
+  color: #333333;
+}

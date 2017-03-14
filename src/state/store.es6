@@ -20,7 +20,15 @@ const defaultState = {
 const addToggleToState = (state, toggle) => {
   const toggleObj = {}
   toggleObj[toggle.id] = toggle
+
   return Object.assign({}, state, {toggles: Object.assign({}, state.toggles, toggleObj)})
+}
+
+const removeToggleFromState = (state, toggleId) => {
+  const toggles = Object.assign({}, state.toggles)
+  delete toggles[toggleId]
+
+  return Object.assign({}, state, {toggles})
 }
 
 const reducer = (state = defaultState, action) => {
@@ -30,9 +38,7 @@ const reducer = (state = defaultState, action) => {
     case SET_TOGGLE:
       return addToggleToState(state, action.toggle)
     case DROP_TOGGLE:
-      const toggles = Object.assign({}, state.toggles)
-      delete toggles[action.toggleId]
-      return Object.assign({}, state, {toggles})
+      return removeToggleFromState(state, action.toggleId)
     case SET_API_KEY:
       localStorage.setItem(API_KEY, action.apiKey)
       return Object.assign({}, state, {apiKey: action.apiKey})
@@ -60,7 +66,7 @@ export const setToggle = toggle => {
 }
 
 export const dropToggle = toggleId => {
-  return {type: DROP_TOGGLE, id: toggleId}
+  return {type: DROP_TOGGLE, toggleId}
 }
 
 export const store = createStore(reducer, applyMiddleware(thunk))
