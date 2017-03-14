@@ -14,3 +14,11 @@ export const arrayToObject = (array, keyField) =>
     acc[cur[keyField]] = cur
     return acc
   }, {})
+
+export const onUnauthorized = action => response => {
+  if(response.status == "Unauthorized") {
+    action()
+  } else {
+    alert(response.message)
+  }
+}

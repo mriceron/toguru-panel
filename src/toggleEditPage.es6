@@ -5,6 +5,7 @@ import { getToggle, createToggle, deleteToggle, updateToggle } from './state/act
 import { ApiKeyModal } from './components/apiKeyModal.es6'
 import { Template } from './components/template.es6'
 import { connect } from 'react-redux'
+import { onUnauthorized } from './utils.es6'
 
 const fromActivations = (toggle, block, defaultValue = {}) =>
   toggle && toggle.activations && toggle.activations[0] && toggle.activations[0][block] || defaultValue
@@ -77,7 +78,7 @@ export const ToggleEditPage =
       },
       loadToggle(toggleId) {
         return this.props.dispatch(getToggle(toggleId))
-            .catch(_ => this.setState({apiKeyModalDisplayed: true}))
+            .catch(onUnauthorized(_ => this.setState({apiKeyModalDisplayed: true})))
       },
       changeToggle(fieldName, mapFunc = v => v) {
         return (e) => {
@@ -148,18 +149,24 @@ export const ToggleEditPage =
       createToggle() {
         this.props.dispatch(createToggle(this.state.toggle))
           .then(action => this.props.router.push('/edit/' + action.toggle.id))
+          .catch(onUnauthorized(_ => this.setState({apiKeyModalDisplayed: true})))
       },
       deleteToggle() {
         this.props.dispatch(deleteToggle(this.state.toggle.id))
           .then(_ => this.props.router.push('/'))
+          .catch(onUnauthorized(_ => this.setState({apiKeyModalDisplayed: true})))
       },
       deleteButtonClick(e) {
         e.preventDefault()
         this.withRetry(_ => this.deleteToggle())
       },
+      updateToggle() {
+        this.props.dispatch(updateToggle(this.state.toggle))
+            .catch(onUnauthorized(_ => this.setState({apiKeyModalDisplayed: true})))
+      },
       updateToggleClick(e) {
         e.preventDefault()
-        this.withRetry(_ => this.props.dispatch(updateToggle(this.state.toggle)))
+        this.withRetry(_ => this.updateToggle())
       },
       render() {
         return (

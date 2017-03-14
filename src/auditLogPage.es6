@@ -4,6 +4,8 @@ import { getAuditLog } from './state/actions.es6'
 import { connect } from 'react-redux'
 import { Template } from './components/template.es6'
 import { Link } from 'react-router'
+import { ApiKeyModal } from './components/apiKeyModal.es6'
+import { onUnauthorized } from './utils.es6'
 import Moment from 'react-moment'
 
 const AuditLogList = ({logs}) => (
@@ -74,15 +76,26 @@ export const AuditLogPage =
     React.createClass({
       getInitialState() {
         return {
+          apiKeyModalDisplayed: false,
+          onRetry: () => null,
           query: null
         }
       },
+      withRetry(action) {
+        this.setState({onRetry: () => action()})
+        action()
+      },
       componentDidMount() {
-        this.props.dispatch(getAuditLog())
+        this.withRetry(() => this.loadAuditLog())
+      },
+      loadAuditLog() {
+        return this.props.dispatch(getAuditLog())
+                   .catch(onUnauthorized(_ => this.setState({apiKeyModalDisplayed: true})))
       },
       render() {
         return (
           <Template pageName='history'>
+          <ApiKeyModal displayed={this.state.apiKeyModalDisplayed} onClose={() => this.setState({apiKeyModalDisplayed: false})} onRetry={this.state.onRetry}/>
             <div className="container-fluid">
                 <div className="row">
                     <div className="col-md-12">
