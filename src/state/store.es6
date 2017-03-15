@@ -8,10 +8,12 @@ const SET_TOGGLE = 'SET_TOGGLE'
 const SET_API_KEY = 'SET_API_KEY'
 const DROP_TOGGLE = 'DROP_TOGGLE'
 const SET_AUDIT_LOG = 'SET_AUDIT_LOG'
+const SET_CONFIG = 'SET_CONFIG'
 
 const API_KEY = 'API_KEY'
 
 const defaultState = {
+  config: {},
   toggles: {},
   auditLog: [],
   apiKey: localStorage.getItem(API_KEY)
@@ -33,6 +35,8 @@ const removeToggleFromState = (state, toggleId) => {
 
 const reducer = (state = defaultState, action) => {
   switch(action.type) {
+    case SET_CONFIG:
+      return Object.assign({}, state, {config: action.config})
     case SET_TOGGLES:
       return Object.assign({}, state, {toggles: arrayToObject(action.toggles, "id")})
     case SET_TOGGLE:
@@ -51,6 +55,10 @@ const reducer = (state = defaultState, action) => {
 
 export const setAuditLog = auditLog => {
   return {type: SET_AUDIT_LOG, auditLog}
+}
+
+export const setConfig = config => {
+  return {type: SET_CONFIG, config}
 }
 
 export const setApiKey = apiKey => {

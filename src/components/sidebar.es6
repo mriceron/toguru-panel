@@ -1,7 +1,8 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import { Link } from 'react-router'
 
-export const Sidebar = ({pageName}) => (
+export const Sidebar = connect(state => state.config)(({pageName, slackLink}) => (
   <div className="sidebar" data-color="blue" data-image="assets/img/sidebar-5.jpg">
     <div className="sidebar-wrapper">
           <div className="logo">
@@ -24,7 +25,7 @@ export const Sidebar = ({pageName}) => (
                   </Link>
               </li>
               <li className="active-pro">
-                  <a href="slack://channel?id=C2Z5P87PB&team=T02B63WEX">
+                  <a href={slackLink}>
                       <i className="pe-7s-help2"></i>
                       <p>Contact in Slack</p>
                   </a>
@@ -32,7 +33,7 @@ export const Sidebar = ({pageName}) => (
           </ul>
     </div>
   </div>
-)
+))
 
 export const MobileSideBar = ({pageName}) => (
   <div className="extra-menu navbar-collapse">

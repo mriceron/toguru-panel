@@ -1,30 +1,35 @@
 import 'whatwg-fetch'
-import { setToggles, setToggle, dropToggle, setAuditLog } from './store.es6'
-import config from './../config.json'
+import { setToggles, setToggle, dropToggle, setAuditLog, setConfig } from './store.es6'
 import { parseJson } from './../utils.es6'
 
-export const getTogglesList = () => dispatch =>
-  fetch(config.apiUrl + '/togglestate')
+export const loadConfig = () => dispatch =>
+  fetch("/config.json")
+    .then(parseJson)
+    .then(setConfig)
+    .then(dispatch)
+
+export const getTogglesList = () => (dispatch, getState) =>
+  fetch(apiUrl(getState) + '/togglestate')
     .then(parseJson)
     .then(setToggles)
     .then(dispatch)
 
 export const getAuditLog = () => (dispatch, getState) =>
-  fetch(config.apiUrl + '/auditlog', {
+  fetch(apiUrl(getState) + '/auditlog', {
     headers: withApiKeyHeader(getState())
   }).then(parseJson)
     .then(setAuditLog)
     .then(dispatch)
 
 export const getToggle = (toggleId) => (dispatch, getState) =>
-  fetch(config.apiUrl + '/toggle/' + toggleId, {
+  fetch(apiUrl(getState) + '/toggle/' + toggleId, {
     headers: withApiKeyHeader(getState())
   }).then(parseJson)
     .then(setToggle)
     .then(dispatch)
 
 export const createToggle = toggle => (dispatch, getState) =>
-  fetch(config.apiUrl + '/toggle', {
+  fetch(apiUrl(getState) + '/toggle', {
     method: 'POST',
     headers: withApiKeyHeader(getState()),
     body: JSON.stringify({
@@ -38,7 +43,7 @@ export const createToggle = toggle => (dispatch, getState) =>
     .then(dispatch)
 
 export const deleteToggle = toggleId => (dispatch, getState) =>
-  fetch(config.apiUrl + '/toggle/' + toggleId, {
+  fetch(apiUrl(getState) + '/toggle/' + toggleId, {
     method: 'DELETE',
     headers: withApiKeyHeader(getState())
   }).then(parseJson)
@@ -55,7 +60,7 @@ export const updateToggle = toggle => dispatch => {
 }
 
 const updateToggleActivation = toggle => (dispatch, getState) =>
-  fetch(config.apiUrl + '/toggle/' + toggle.id + "/activations/0", {
+  fetch(apiUrl(getState) + '/toggle/' + toggle.id + "/activations/0", {
     method: 'PUT',
     headers: withApiKeyHeader(getState()),
     body: JSON.stringify(toggle.activations[0])
@@ -64,7 +69,7 @@ const updateToggleActivation = toggle => (dispatch, getState) =>
     .then(dispatch)
 
 const disableToggleActivation = toggle => (dispatch, getState) =>
-fetch(config.apiUrl + '/toggle/' + toggle.id + "/activations/0", {
+fetch(apiUrl(getState) + '/toggle/' + toggle.id + "/activations/0", {
   method: 'DELETE',
   headers: withApiKeyHeader(getState())
 }).then(parseJson)
@@ -81,3 +86,4 @@ const checkToguruResponse = (onSuccess) => (response) => {
 const withApiKeyHeader = state => {
   return { Authorization: "api-key " + state.apiKey }
 }
+const apiUrl = getState => getState().config.apiUrl
