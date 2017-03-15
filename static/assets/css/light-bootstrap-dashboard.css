@@ -2736,6 +2736,10 @@ body > .navbar-collapse[data-color="purple"]:after {
 
 @media (min-width: 992px) {
 
+  .extra-menu {
+    display: none!important;
+  }
+
   .navbar-form {
     margin-top: 21px;
     margin-bottom: 21px;
@@ -3403,6 +3407,7 @@ body > .navbar-collapse[data-color="purple"]:after {
   .table-responsive {
     overflow: visible;
   }
+
 }
 @media (max-width: 991px) {
   .table-responsive {
@@ -3417,10 +3422,10 @@ body > .navbar-collapse[data-color="purple"]:after {
 
 .navbar-logo {
   text-transform: uppercase;
-  padding: 14px 0px;
+  padding: 15px 17px;
   display: block;
-  font-size: 18px;
-  text-align: center;
+  text-align: left;
+  font-size: 19px;
   font-weight: 400;
   line-height: 30px;
 }
@@ -3460,20 +3465,38 @@ body > .navbar-collapse[data-color="purple"]:after {
 }
 
 @media screen and (max-width: 767px) {
+  .navbar-logo {
+    padding: 15px 31px!important;
+  }
   .table-responsive {
     border: none!important;
     border-top: 1px solid #ddd!important;
     margin-top: 16px!important;
   }
+
+  .search-panel li {
+    width: 100%!important;
+    display: block!important;
+  }
+
+  .search-panel .with-margin {
+    margin-top: 10px!important;
+  }
+
+  .search-panel .form-group {
+    float: none!important;
+    max-width: 100%!important;
+  }
+
+  .category.new_toggle {
+    float: right!important;
+    position: relative;
+    top: -24px;
+  }
 }
 
 .delete-toggle {
   margin-right: 12px;
-}
-
-.search-field {
-  float: right;
-  width: 300px;
 }
 
 .displayed {
@@ -3494,4 +3517,48 @@ label.error {
 }
 .black:hover {
   color: #333333;
+}
+.badge {
+  padding-top: 4px !important;
+}
+
+.search-panel {
+  padding: 0px;
+  margin: 0px;
+  list-style: none;
+}
+
+.search-panel li {
+  display: inline-block;
+  vertical-align: top;
+  width: 50%;
+  padding: 0px;
+  margin: 0px;
+}
+
+.search-panel .form-group {
+  max-width: 300px;
+  width: 100%;
+  float: right;
+}
+
+.toggled-navbar {
+  width: 100%;
+}
+
+.toggled-navbar a {
+  color: #333!important;
+}
+
+.toggled-navbar a:hover {
+  color: #1F77D0!important;
+}
+
+body .extra-menu {
+  display: none;
+  background-color: white;
+}
+
+.extra-menu.displayed {
+  display: block;
 }

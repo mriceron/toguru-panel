@@ -242,7 +242,7 @@ export const ToggleEditPage =
                       </div>
                   </div>
 
-                  {this.state.toggleId ?
+                  {false && this.state.toggleId ?
                     <div className="col-md-4">
                       <div className="card">
                           <div className="header">

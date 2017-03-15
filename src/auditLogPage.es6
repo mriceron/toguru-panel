@@ -45,15 +45,15 @@ const AuditLogEntry = ({log}) => (
 const matchEvent = (event) => {
   switch (event) {
     case "toggle created":
-      return <code className="rolled-out">Created</code>
+      return <span className="badge rolled-out">Created</span>
     case "activation created":
-      return <code className="not-rolling">Activation Created</code>
+      return <span className="badge not-rolling">Activation Created</span>
     case "activation updated":
-      return <code className="not-rolling">Activation Updated</code>
+      return <span className="badge not-rolling">Activation Updated</span>
     case "activation deleted":
-      return <code className="not-rolling">Activation Deleted</code>
+      return <span className="badge not-rolling">Activation Deleted</span>
     case "toggle deleted":
-      return <code className="rolling-out">Deleted</code>
+      return <span className="badge rolling-out">Deleted</span>
     default:
       return event
   }
@@ -101,13 +101,17 @@ export const AuditLogPage =
                     <div className="col-md-12">
                         <div className="card">
                             <div className="header">
-                                <div className="search-field">
+                              <ul className="search-panel">
+                                <li>
+                                  <h4 className="title">History log</h4>
+                                  <a className="black">We know everything about you, dude</a>
+                                </li>
+                                <li className="with-margin">
                                   <div className="form-group">
                                     <input type="text" className="form-control" placeholder="Search query" onChange={query => this.setState({query: query.target.value.toLowerCase()})}/>
                                   </div>
-                                </div>
-                                <h4 className="title">History log</h4>
-                                <a className="black">We know everything about you, dude</a>
+                                </li>
+                              </ul>
                             </div>
                             <AuditLogList logs={this.props.auditLog.filter(filterLogs(this.state.query))}/>
                         </div>

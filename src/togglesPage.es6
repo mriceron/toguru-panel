@@ -10,13 +10,13 @@ import { objectToArray } from './utils.es6'
 const generateRolloutBlock = percentage => {
   switch (percentage) {
     case 100:
-      return <code className="rolled-out">100%</code>
+      return <span className="badge rolled-out">100%</span>
     case 0:
-      return <code className="not-rolling">0%</code>
+      return <span className="badge not-rolling">0%</span>
     case undefined:
-      return <code className="not-rolling">0%</code>
+      return <span className="badge not-rolling">0%</span>
     default:
-      return <code className="rolling-out">{percentage + "%"}</code>
+      return <span className="badge rolling-out">{percentage + "%"}</span>
   }
 }
 
@@ -86,13 +86,17 @@ export const TogglesPage =
                     <div className="col-md-12">
                         <div className="card">
                             <div className="header">
-                                <div className="search-field">
+                              <ul className="search-panel">
+                                <li>
+                                  <h4 className="title">Toggles list</h4>
+                                  <Link to={'/create'} className="category new_toggle">Add new toggle</Link>
+                                </li>
+                                <li>
                                   <div className="form-group">
                                     <input type="text" className="form-control" placeholder="Search query" onChange={query => this.setState({query: query.target.value.toLowerCase()})}/>
                                   </div>
-                                </div>
-                                <h4 className="title">Toggles list</h4>
-                                <Link to={'/create'} className="category new_toggle">Add new toggle</Link>
+                                </li>
+                              </ul>
                             </div>
                             <TogglesList toggles={this.props.toggles.filter(filterToggles(this.state.query))}/>
                         </div>

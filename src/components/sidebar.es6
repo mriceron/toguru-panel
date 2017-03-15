@@ -33,3 +33,28 @@ export const Sidebar = ({pageName}) => (
     </div>
   </div>
 )
+
+export const MobileSideBar = ({pageName}) => (
+  <div className="extra-menu navbar-collapse">
+     <ul className="nav navbar-nav toggled-navbar">
+       <li className={pageName == 'toggles' ? "active" : ""}>
+           <Link to={"/"}>
+               <i className="pe-7s-note2"></i>
+               <p>Toggles</p>
+           </Link>
+       </li>
+       <li className={pageName == 'history' ? "active" : ""}>
+           <Link to={"/history"}>
+               <i className="pe-7s-news-paper"></i>
+               <p>History</p>
+           </Link>
+       </li>
+       <li className="active-pro">
+           <a href="slack://channel?id=C2Z5P87PB&team=T02B63WEX">
+               <i className="pe-7s-help2"></i>
+               <p>Contact in Slack</p>
+           </a>
+       </li>
+     </ul>
+</div>
+)
