@@ -4,7 +4,7 @@ Webpanel for managing [Toguru](https://github.com/AutoScout24/toguru) toggles.
 ![Toguru management panel screen](http://i.piccy.info/i9/fd46649a24540d43e8e21ef2ff696767/1489583829/72496/1116036/Screen_Shot_2017_03_15_at_14_16_24.jpg)
 
 ## Usage
-Download last version (1.0.0) of toguru-panel [here](https://github.com/AutoScout24/toguru-panel/releases/download/1.0.0/toguru-panel.zip) and configure it!
+Download last version (1.0.0) of toguru-panel [here](https://github.com/AutoScout24/toguru-panel/releases/download/1.0.0/toguru-panel.zip), configure it and run on webserver!
 
 ### Configuration
 In `config.json` file you can configure toguru-panel for you own purposes.
