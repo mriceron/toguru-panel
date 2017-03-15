@@ -1,4 +1,4 @@
 {
-  "apiUrl": "https://toguru.tools.autoscout24.com",
-  "slackLink": "slack://channel?id=C2Z5P87PB&team=T02B63WEX"
+  "apiUrl": "https://toguru.autoscout24.com",
+  "slackLink": "slack://channel?id={CHANNEL_ID}&team={TEAM_ID}"
 }
