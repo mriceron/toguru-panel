@@ -17,6 +17,11 @@ gulp.task('clean', () => {
         .pipe(clean());
 })
 
+gulp.task('clean:css', () => {
+  return gulp.src('dist/assets/css', {read: false})
+      .pipe(clean());
+})
+
 gulp.task('copy:statics', () => {
     return gulp.src(['./static/**/*'])
                .pipe(gulp.dest('./dist'))
@@ -66,7 +71,7 @@ gulp.task('dist:development', callback =>
 
 gulp.task('dist:production', callback => {
   process.env.NODE_ENV = 'production'
-  return runSequence('clean', 'copy:statics', 'build:css', 'build:es6', 'uglify:js', callback)
+  return runSequence('clean', 'copy:statics', 'build:css', 'clean:css', 'build:es6', 'uglify:js', callback)
 })
 
 gulp.task('watch', ['dist:development'], () => {
