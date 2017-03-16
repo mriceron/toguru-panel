@@ -55,13 +55,14 @@ export const ToggleEditPage =
         }
       },
       componentDidMount() {
-        if(this.props.params && this.props.params.toggleId) {
-          this.initToggle(this.props.params.toggleId)
+        console.log()
+        if(this.props.match.params.toggleId) {
+          this.initToggle(this.props.match.params.toggleId)
         }
       },
       componentWillReceiveProps(nextProps) {
-        if(this.state.toggleId != nextProps.params.toggleId) {
-          this.initToggle(nextProps.params.toggleId)
+        if(this.state.toggleId != nextProps.match.params.toggleId) {
+          this.initToggle(nextProps.match.params.toggleId)
         }
       },
       initToggle(toggleId) {
