@@ -37,7 +37,6 @@ __deploy_s3() {
 }
 
 npm install
-npm install -g gulp
-gulp dist:production
+npm run gulp dist:production
 echo "${CONFIG_JSON}" > './dist/config.json'
 __deploy_s3 "$@"
