@@ -2,7 +2,7 @@ import React from 'react'
 
 import { getTogglesList } from './state/actions.es6'
 import { connect } from 'react-redux'
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 import { Template } from './components/template.es6'
 
 import { objectToArray } from './utils.es6'
@@ -22,7 +22,7 @@ const generateRolloutBlock = percentage => {
 
 const ToggleEntry = ({toggle}) => (
   <tr>
-    <td><Link to={"edit/" + toggle.id}>{toggle.id}</Link></td>
+    <td><Link to={"/edit/" + toggle.id}>{toggle.id}</Link></td>
     <td>{generateRolloutBlock(toggle.rolloutPercentage)}</td>
     <td>{objectToArray(toggle.tags).map(tag => <code className="tag" key={toggle.id + "-" + tag}>{tag}</code>)}</td>
   </tr>

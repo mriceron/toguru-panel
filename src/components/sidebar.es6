@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 
 export const Sidebar = connect(state => state.config)(({pageName, slackLink}) => (
   <div className="sidebar" data-color="blue" data-image="assets/img/sidebar-5.jpg">

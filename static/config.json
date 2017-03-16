@@ -1,4 +1,5 @@
 {
   "apiUrl": "https://toguru.autoscout24.com",
-  "slackLink": "slack://channel?id={CHANNEL_ID}&team={TEAM_ID}"
+  "slackLink": "slack://channel?id={CHANNEL_ID}&team={TEAM_ID}",
+  "hashRouting": true
 }

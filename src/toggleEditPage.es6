@@ -55,7 +55,9 @@ export const ToggleEditPage =
         }
       },
       componentDidMount() {
-        this.initToggle(this.props.params.toggleId)
+        if(this.props.params && this.props.params.toggleId) {
+          this.initToggle(this.props.params.toggleId)
+        }
       },
       componentWillReceiveProps(nextProps) {
         if(this.state.toggleId != nextProps.params.toggleId) {
