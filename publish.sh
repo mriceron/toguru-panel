@@ -36,8 +36,8 @@ __deploy_s3() {
   --cache-control "max-age=31536000"
 }
 
+npm install
+npm install -g gulp
 gulp dist:production
-
 echo "${CONFIG_JSON}" > './dist/config.json'
-
 __deploy_s3 "$@"
