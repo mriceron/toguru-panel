@@ -55,7 +55,6 @@ export const ToggleEditPage =
         }
       },
       componentDidMount() {
-        console.log()
         if(this.props.match.params.toggleId) {
           this.initToggle(this.props.match.params.toggleId)
         }
@@ -151,12 +150,12 @@ export const ToggleEditPage =
       },
       createToggle() {
         this.props.dispatch(createToggle(this.state.toggle))
-          .then(action => this.props.router.push('/edit/' + action.toggle.id))
+          .then(action => this.props.history.push('/edit/' + action.toggle.id))
           .catch(onUnauthorized(_ => this.setState({apiKeyModalDisplayed: true})))
       },
       deleteToggle() {
         this.props.dispatch(deleteToggle(this.state.toggle.id))
-          .then(_ => this.props.router.push('/'))
+          .then(_ => this.props.history.push('/'))
           .catch(onUnauthorized(_ => this.setState({apiKeyModalDisplayed: true})))
       },
       deleteButtonClick(e) {
