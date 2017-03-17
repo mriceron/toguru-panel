@@ -2,12 +2,6 @@ import 'whatwg-fetch'
 import { setToggles, setToggle, dropToggle, setAuditLog, setConfig } from './store.es6'
 import { parseJson } from './../utils.es6'
 
-export const loadConfig = () => dispatch =>
-  fetchFile("./config.json")
-    .then(parseJson)
-    .then(setConfig)
-    .then(dispatch)
-
 export const getTogglesList = () => (dispatch, getState) =>
   fetch(apiUrl(getState) + '/togglestate')
     .then(parseJson)
@@ -76,19 +70,6 @@ fetch(apiUrl(getState) + '/toggle/' + toggle.id + "/activations/0", {
   .then(checkToguruResponse(_ => setToggle(toggle)))
   .then(dispatch)
 
-const fetchFile = (url) => {
-  return new Promise(function(resolve, reject) {
-    var xhr = new XMLHttpRequest
-    xhr.onload = function() {
-      resolve(new Response(xhr.responseText, {status: xhr.status || 200}))
-    }
-    xhr.onerror = function() {
-      reject(new TypeError('Local request failed'))
-    }
-    xhr.open('GET', url)
-    xhr.send(null)
-  })
-}
 const checkToguruResponse = (onSuccess) => (response) => {
   if(response.status == "Ok") {
     return onSuccess(response)
