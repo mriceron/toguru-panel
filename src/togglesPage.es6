@@ -86,7 +86,7 @@ export const TogglesPage =
         this.props.dispatch(getTogglesList())
             .then(_ => this.setState({fetchStatus: "success"}))
             .catch(err => {
-              alert("Something goes wrong: " + JSON.stringify(err))
+              alert("Unable to fetch data from Toguru API.")
               this.setState({fetchStatus: "failed"})
             })
       },
