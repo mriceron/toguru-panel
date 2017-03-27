@@ -72,11 +72,23 @@ export const TogglesPage =
     React.createClass({
       getInitialState() {
         return {
-          query: null
+          query: null,
+          fetchStatus: ""
         }
       },
       componentDidMount() {
+        if(this.props.toggles.length == 0) {
+          this.fetchList()
+        }
+      },
+      fetchList() {
+        this.setState({fetchStatus: "loading"})
         this.props.dispatch(getTogglesList())
+            .then(_ => this.setState({fetchStatus: "success"}))
+            .catch(err => {
+              alert("Something goes wrong: " + JSON.stringify(err))
+              this.setState({fetchStatus: "failed"})
+            })
       },
       render() {
         return (
@@ -88,7 +100,7 @@ export const TogglesPage =
                             <div className="header">
                               <ul className="search-panel">
                                 <li>
-                                  <h4 className="title">Toggles list</h4>
+                                  <h4 className="title">Toggles list &nbsp;<span className={"pe-7s-refresh-cloud sync-button " + this.state.fetchStatus} onClick={this.fetchList}></span></h4>
                                   <Link to={'/create'} className="category new_toggle">Add new toggle</Link>
                                 </li>
                                 <li>

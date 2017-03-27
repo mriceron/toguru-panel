@@ -4,6 +4,7 @@ import { withRouter } from 'react-router'
 import { getToggle, createToggle, deleteToggle, updateToggle } from './state/actions.es6'
 import { ApiKeyModal } from './components/apiKeyModal.es6'
 import { Template } from './components/template.es6'
+import { ActionButton } from './components/actionButton.es6'
 import { connect } from 'react-redux'
 import { onUnauthorized } from './utils.es6'
 
@@ -231,12 +232,12 @@ export const ToggleEditPage =
                                       </div>
                                   </div>
 
-                                  {this.state.toggleId ?
+                                 {this.state.toggleId ?
                                     <div>
-                                      <button type="submit" className="btn btn-success btn-fill pull-right" onClick={this.updateToggleClick}>Update</button>
-                                      <button type="submit" className="btn btn-danger btn-fill pull-right delete-toggle" onClick={this.deleteButtonClick}>Delete</button>
+                                      <ActionButton className="btn btn-fill pull-right" onClick={this.updateToggleClick} completedText="Updated!">Update</ActionButton>
+                                      <ActionButton className="btn btn-fill pull-right delete-toggle" onClick={this.deleteButtonClick} colorClass="btn-danger">Delete</ActionButton>
                                     </div> :
-                                    <button type="submit" className="btn btn-success btn-fill pull-right" onClick={this.validateAndCreateToggle}>Create</button>
+                                    <ActionButton className="btn btn-fill pull-right" onClick={this.validateAndCreateToggle} completedText="Created!">Create</ActionButton>
                                   }
                                   <div className="clearfix"></div>
                               </form>

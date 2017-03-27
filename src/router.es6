@@ -11,7 +11,7 @@ export const AppRouter = (eventStore) => {
     <Provider store={eventStore}>
         {isHashRoutingEnabled(eventStore) ?
           <HashRouter><RouteSwitch/></HashRouter> :
-          <BrowserRouter><RouteSwitch/></BrowserRouter>
+          <BrowserRouter basename="/"><RouteSwitch/></BrowserRouter>
         }
     </Provider>
   )
