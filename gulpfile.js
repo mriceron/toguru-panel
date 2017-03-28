@@ -84,7 +84,8 @@ gulp.task('serve', () => {
     .pipe(webserver({
       livereload: true,
       open: true,
-      fallback: 'index.html'
+      fallback: 'index.html',
+      host: '0.0.0.0',
     }))
 })
 

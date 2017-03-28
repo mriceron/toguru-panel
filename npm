@@ -1,0 +1,4 @@
+#!/bin/bash
+# Runs npm through a docker container, with npm as entrypoint.
+# Syntax is exactly the same as regular npm.
+docker run -it --rm -v $PWD:/app -w /app --entrypoint="npm" -p 8000:8000 node:7 "$@"

@@ -19,5 +19,12 @@ To run production build, use: `gulp dist:production`.
 ### Development
 If you want to develop toguru-panel, use default gulp task. It will serve application with watches and fast development builds.
 
+### Docker
+
+You can install and run the application through a docker container using `./npm` script (pipes all commands to npm running inside a node docker container)
+
+- Install deps: `./npm install`
+- Run dev server: `./npm run gulp`
+
 ## Licence
 See the [LICENSE](LICENSE.md) file for license rights and limitations (MIT).
