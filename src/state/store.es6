@@ -1,5 +1,6 @@
-import { createStore, applyMiddleware } from 'redux'
+import { createStore, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
+import DevTools from '../components/devTools';
 
 import { arrayToObject } from './../utils.es6'
 
@@ -70,4 +71,10 @@ export const dropToggle = toggleId => {
   return {type: DROP_TOGGLE, toggleId}
 }
 
-export const store = createStore(reducer, applyMiddleware(thunk))
+const enhancer = compose(
+  applyMiddleware(thunk),
+  // Required! Enable Redux DevTools with the monitors you chose
+  DevTools.instrument()
+)
+
+export const store = createStore(reducer, defaultState, enhancer)
