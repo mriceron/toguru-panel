@@ -5,7 +5,7 @@ import { BrowserRouter, HashRouter, Route, Switch } from 'react-router-dom'
 import { TogglesPage } from './togglesPage.es6'
 import { ToggleEditPage } from './toggleEditPage.es6'
 import { AuditLogPage } from './auditLogPage.es6'
-import DevTools from './components/devTools.es6';
+import DevTools from './components/devTools.es6'
 
 export const AppRouter = (eventStore) => {
   return (
@@ -17,7 +17,8 @@ export const AppRouter = (eventStore) => {
                   <BrowserRouter basename="/"><RouteSwitch/></BrowserRouter>
                 }
             </div>
-            { <DevTools /> }
+            { /* Include devtools under dev environment only */}
+            { process.env !== 'production ' && <DevTools /> }
         </div>
     </Provider>
   )

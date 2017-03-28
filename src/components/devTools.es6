@@ -7,6 +7,6 @@ const devTools = createDevTools(
     <DockMonitor toggleVisibilityKey='ctrl-h' changePositionKey='ctrl-j' defaultIsVisible={false}>
         <LogMonitor theme='solarized' />
     </DockMonitor>
-);
+)
 
 export default devTools

@@ -71,10 +71,12 @@ export const dropToggle = toggleId => {
   return {type: DROP_TOGGLE, toggleId}
 }
 
-const enhancer = compose(
-  applyMiddleware(thunk),
-  // Required! Enable Redux DevTools with the monitors you chose
-  DevTools.instrument()
-)
+// Exclude devtools for production build
+const enhancer = process.env !== 'production' ?
+  compose(
+    applyMiddleware(thunk),
+    DevTools.instrument() // Enable Redux DevTools with the monitors you chose
+  ) :
+  compose(applyMiddleware(thunk))
 
 export const store = createStore(reducer, defaultState, enhancer)
