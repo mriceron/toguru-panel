@@ -19,7 +19,8 @@ To run production build, use: `gulp dist:production`.
 ### Development
 If you want to develop toguru-panel, use default gulp task. It will serve application with watches and fast development builds.
 
-To override default api url for development, please use --apiUrl parameter. Example: `gulp --apiUrl https://toguru.autoscout24.com`.
+To override default api url for development, please use --apiUrl parameter.  
+`gulp --apiUrl https://toguru.autoscout24.com`.
 
 ### Docker
 
