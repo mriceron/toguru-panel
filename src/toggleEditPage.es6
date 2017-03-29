@@ -6,7 +6,6 @@ import { ApiKeyModal } from './components/apiKeyModal.es6'
 import { Template } from './components/template.es6'
 import { ActionButton } from './components/actionButton.es6'
 import { connect } from 'react-redux'
-import { onUnauthorized } from './utils.es6'
 
 const fromActivations = (toggle, block, defaultValue = {}) =>
   toggle && toggle.activations && toggle.activations[0] && toggle.activations[0][block] || defaultValue
@@ -50,9 +49,7 @@ export const ToggleEditPage =
           toggleId: null,
           toggle: {},
           oldToggle: {},
-          errors: new Set(),
-          apiKeyModalDisplayed: false,
-          onRetry: () => null
+          errors: new Set()
         }
       },
       componentDidMount() {
@@ -67,21 +64,13 @@ export const ToggleEditPage =
       },
       initToggle(toggleId) {
         this.setState({toggleId: toggleId})
-        if(toggleId)
-          this.withRetry(() =>
-            this.loadToggle(toggleId)
-                .then(_ =>
-                  this.setState({oldToggle: this.props.toggles[toggleId], toggle: this.props.toggles[toggleId]})
-                )
-          )
-      },
-      withRetry(action) {
-        this.setState({onRetry: () => action()})
-        action()
-      },
-      loadToggle(toggleId) {
-        return this.props.dispatch(getToggle(toggleId))
-            .catch(onUnauthorized(_ => this.setState({apiKeyModalDisplayed: true})))
+        if(toggleId) {
+          this.props.dispatch(getToggle(toggleId))
+            .then(_ => this.setState({
+              oldToggle: this.props.toggles[toggleId],
+              toggle: this.props.toggles[toggleId]
+            }))
+        }
       },
       changeToggle(fieldName, mapFunc = v => v) {
         return (e) => {
@@ -147,29 +136,17 @@ export const ToggleEditPage =
           return false
         }
 
-        this.withRetry(() => this.createToggle())
-      },
-      createToggle() {
         this.props.dispatch(createToggle(this.state.toggle))
           .then(action => this.props.history.push('/edit/' + action.toggle.id))
-          .catch(onUnauthorized(_ => this.setState({apiKeyModalDisplayed: true})))
-      },
-      deleteToggle() {
-        this.props.dispatch(deleteToggle(this.state.toggle.id))
-          .then(_ => this.props.history.push('/'))
-          .catch(onUnauthorized(_ => this.setState({apiKeyModalDisplayed: true})))
       },
       deleteButtonClick(e) {
         e.preventDefault()
-        this.withRetry(_ => this.deleteToggle())
-      },
-      updateToggle() {
-        this.props.dispatch(updateToggle(this.state.toggle))
-            .catch(onUnauthorized(_ => this.setState({apiKeyModalDisplayed: true})))
+        this.props.dispatch(deleteToggle(this.state.toggle.id))
+          .then(_ => this.props.history.push('/'))
       },
       updateToggleClick(e) {
         e.preventDefault()
-        this.withRetry(_ => this.updateToggle())
+        this.props.dispatch(updateToggle(this.state.toggle))
       },
       render() {
         return (
@@ -177,7 +154,6 @@ export const ToggleEditPage =
             <div className="container-fluid">
                 <div className="row">
                   <div className="col-md-8">
-                  <ApiKeyModal displayed={this.state.apiKeyModalDisplayed} onClose={() => this.setState({apiKeyModalDisplayed: false})} onRetry={this.state.onRetry}/>
                       <div className="card">
                           <div className="header">
                               <h4 className="title">{this.state.toggleId ? "Edit Toggle" : "Create Toggle"}</h4>
