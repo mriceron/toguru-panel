@@ -11,20 +11,29 @@ const runSequence = require('run-sequence')
 const uglify = require('gulp-uglify')
 const buffer = require('vinyl-buffer')
 const envify = require('gulp-envify')
+const argv = require('yargs').argv
+const replace = require('gulp-replace')
 
 gulp.task('clean', () => {
-    return gulp.src('dist', {read: false})
+    return gulp.src('./dist', {read: false})
         .pipe(clean());
 })
 
 gulp.task('clean:css', () => {
-  return gulp.src('dist/assets/css', {read: false})
+  return gulp.src('./dist/assets/css', {read: false})
       .pipe(clean());
 })
 
 gulp.task('copy:statics', () => {
     return gulp.src(['./static/**/*'])
                .pipe(gulp.dest('./dist'))
+})
+
+gulp.task('build:config', () => {
+  const defaultApiUrl = 'https://toguru.autoscout24.com'
+  gulp.src('./dist/config.json')
+      .pipe(replace(defaultApiUrl, argv.apiUrl || defaultApiUrl))
+      .pipe(gulp.dest('./dist'))
 })
 
 gulp.task('build:css', () => {
@@ -66,7 +75,7 @@ gulp.task('uglify:js', () => {
 })
 
 gulp.task('dist:development', callback =>
-  runSequence('clean', 'copy:statics', 'build:css', 'build:es6', callback)
+  runSequence('clean', 'copy:statics', 'build:config', 'build:css', 'build:es6', callback)
 )
 
 gulp.task('dist:production', callback => {
