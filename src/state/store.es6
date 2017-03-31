@@ -1,5 +1,6 @@
-import { createStore, applyMiddleware } from 'redux'
+import { createStore, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
+import DevTools from '../components/devTools';
 
 import { arrayToObject } from './../utils.es6'
 
@@ -68,4 +69,12 @@ export const setToggles = toggles => ({type: SET_TOGGLES, toggles})
 export const setToggle = toggle => ({type: SET_TOGGLE, toggle})
 export const dropToggle = toggleId => ({type: DROP_TOGGLE, toggleId})
 
-export const store = createStore(reducer, applyMiddleware(thunk))
+// Exclude devtools for production build
+const enhancer = process.env !== 'production' ?
+  compose(
+    applyMiddleware(thunk),
+    DevTools.instrument() // Enable Redux DevTools with the monitors you chose
+  ) :
+  compose(applyMiddleware(thunk))
+
+export const store = createStore(reducer, defaultState, enhancer)
