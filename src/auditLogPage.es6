@@ -3,13 +3,14 @@ import React from 'react'
 import { getAuditLog } from './state/actions.es6'
 import { connect } from 'react-redux'
 import { Template } from './components/template.es6'
+import { Paginator } from './components/paginator.es6'
 import { Link } from 'react-router'
 import { ApiKeyModal } from './components/apiKeyModal.es6'
 import Moment from 'react-moment'
 
 const AuditLogList = ({logs}) => (
-  <div className="content table-responsive table-full-width">
-      <table className="table table-hover table-striped toggles-table">
+  <div className="content table-responsive table-full-width no-padding-bottom">
+      <table className="table table-hover table-striped toggles-table no-padding-bottom">
           <thead>
             <tr>
               <th>Toggle ID</th>
@@ -23,6 +24,7 @@ const AuditLogList = ({logs}) => (
               {logs.map(t => <AuditLogEntry log={t} key={t.id + "-" + t.meta.epoch}/>)}
           </tbody>
       </table>
+      <hr className="no-padding"/>
   </div>
 )
 
@@ -70,11 +72,18 @@ const filterLogs = (query) => (log) => {
          isStartsWith(log.meta.user, query)
 }
 
+const filterPagination = (page, perPage) => (_, index) =>
+  (index >= (page - 1) * perPage) && (index < (page * perPage))
+
+const totalPages = (totalEntries, perPage) =>
+  Math.ceil(totalEntries / perPage)
+
 export const AuditLogPage =
   connect(s => s)(
     React.createClass({
       getInitialState() {
         return {
+          currentPage: 1,
           query: null
         }
       },
@@ -101,7 +110,10 @@ export const AuditLogPage =
                                 </li>
                               </ul>
                             </div>
-                            <AuditLogList logs={this.props.auditLog.filter(filterLogs(this.state.query))}/>
+                            <AuditLogList logs={this.props.auditLog.filter(filterLogs(this.state.query)).filter(filterPagination(this.state.currentPage, this.props.config.entriesPerPage))}/>
+                            <div className="pagination-wrapper">
+                              <Paginator pagesTotal={totalPages(this.props.auditLog.length, this.props.config.entriesPerPage)} currentPage={this.state.currentPage} onClick={page => this.setState({currentPage: page})}/>
+                            </div>
                         </div>
                     </div>
                 </div>
