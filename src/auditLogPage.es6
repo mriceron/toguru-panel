@@ -3,7 +3,7 @@ import React from 'react'
 import { getAuditLog } from './state/actions.es6'
 import { connect } from 'react-redux'
 import { Template } from './components/template.es6'
-import { Paginator } from './components/paginator.es6'
+import { Paginator, paginationFilter } from './components/paginator.es6'
 import { Link } from 'react-router'
 import { ApiKeyModal } from './components/apiKeyModal.es6'
 import Moment from 'react-moment'
@@ -72,12 +72,6 @@ const filterLogs = (query) => (log) => {
          isStartsWith(log.meta.user, query)
 }
 
-const filterPagination = (page, perPage) => (_, index) =>
-  (index >= (page - 1) * perPage) && (index < (page * perPage))
-
-const totalPages = (totalEntries, perPage) =>
-  Math.ceil(totalEntries / perPage)
-
 export const AuditLogPage =
   connect(s => s)(
     React.createClass({
@@ -122,9 +116,9 @@ export const AuditLogPage =
                                 </li>
                               </ul>
                             </div>
-                            <AuditLogList logs={this.getLogs().filter(filterPagination(this.state.currentPage, this.props.config.entriesPerPage))}/>
+                            <AuditLogList logs={this.getLogs().filter(paginationFilter(this.state.currentPage, this.props.config.entriesPerPage))}/>
                             <div className="pagination-wrapper">
-                              <Paginator pagesTotal={totalPages(this.getLogs().length, this.props.config.entriesPerPage)} currentPage={this.state.currentPage} onClick={page => this.setState({currentPage: page})}/>
+                              <Paginator totalEntries={this.getLogs().length} perPage={this.props.config.entriesPerPage} currentPage={this.state.currentPage} onClick={page => this.setState({currentPage: page})}/>
                             </div>
                         </div>
                     </div>

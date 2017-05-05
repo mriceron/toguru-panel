@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { getTogglesList } from './state/actions.es6'
+import { Paginator, paginationFilter } from './components/paginator.es6'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Template } from './components/template.es6'
@@ -29,8 +30,8 @@ const ToggleEntry = ({toggle}) => (
 )
 
 const TogglesList = ({toggles}) => (
-  <div className="content table-responsive table-full-width">
-      <table className="table table-hover table-striped toggles-table">
+  <div className="content table-responsive table-full-width no-padding-bottom">
+      <table className="table table-hover table-striped toggles-table no-padding-bottom">
           <thead>
             <tr>
               <th>Toggle ID</th>
@@ -42,6 +43,7 @@ const TogglesList = ({toggles}) => (
               {toggles.map(t => <ToggleEntry toggle={t} key={t.id}/>)}
           </tbody>
       </table>
+      <hr className="no-padding"/>
   </div>
 )
 
@@ -63,9 +65,8 @@ const filterToggles = (query) => (toggle) => {
          isToggleTagsContainsQuery(toggle.tags, query)
 }
 
-const toTogglesList = state => {
-  return {toggles: objectToArray(state.toggles)}
-}
+const toTogglesList = state =>
+  ({toggles: objectToArray(state.toggles), config: state.config})
 
 export const TogglesPage =
   connect(toTogglesList)(
@@ -73,7 +74,9 @@ export const TogglesPage =
       getInitialState() {
         return {
           query: null,
-          fetchStatus: ""
+          fetchStatus: "",
+          currentPage: 1,
+          filteredToggles: []
         }
       },
       componentDidMount() {
@@ -90,6 +93,17 @@ export const TogglesPage =
               this.setState({fetchStatus: "failed"})
             })
       },
+      onQueryChange(query) {
+        if(query) {
+          const filteredToggles = this.props.toggles.filter(filterToggles(this.state.query))
+          this.setState({query, currentPage: 1, filteredToggles})
+        } else {
+          this.setState({query, currentPage: 1, filteredToggles: []})
+        }
+      },
+      getToggles() {
+        return this.state.filteredToggles.length > 0 ? this.state.filteredToggles : this.props.toggles
+      },
       render() {
         return (
           <Template pageName='toggles'>
@@ -105,12 +119,15 @@ export const TogglesPage =
                                 </li>
                                 <li>
                                   <div className="form-group">
-                                    <input type="text" className="form-control" placeholder="Search query" onChange={query => this.setState({query: query.target.value.toLowerCase()})}/>
+                                    <input type="text" className="form-control" placeholder="Search query" onChange={e => this.onQueryChange(e.target.value.toLowerCase())}/>
                                   </div>
                                 </li>
                               </ul>
                             </div>
-                            <TogglesList toggles={this.props.toggles.filter(filterToggles(this.state.query))}/>
+                            <TogglesList toggles={this.getToggles().filter(paginationFilter(this.state.currentPage, this.props.config.entriesPerPage))}/>
+                            <div className="pagination-wrapper">
+                              <Paginator totalEntries={this.getToggles().length} perPage={this.props.config.entriesPerPage} currentPage={this.state.currentPage} onClick={page => this.setState({currentPage: page})}/>
+                            </div>
                         </div>
                     </div>
                 </div>
