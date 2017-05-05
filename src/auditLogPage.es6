@@ -84,11 +84,23 @@ export const AuditLogPage =
       getInitialState() {
         return {
           currentPage: 1,
-          query: null
+          query: null,
+          filteredLogs: []
         }
       },
       componentDidMount() {
         this.props.dispatch(getAuditLog())
+      },
+      onQueryChange(query) {
+        if(query) {
+          const filteredLogs = this.props.auditLog.filter(filterLogs(this.state.query))
+          this.setState({query, currentPage: 1, filteredLogs})
+        } else {
+          this.setState({query, currentPage: 1, filteredLogs: []})
+        }
+      },
+      getLogs() {
+        return this.state.filteredLogs.length > 0 ? this.state.filteredLogs : this.props.auditLog
       },
       render() {
         return (
@@ -105,14 +117,14 @@ export const AuditLogPage =
                                 </li>
                                 <li className="with-margin">
                                   <div className="form-group">
-                                    <input type="text" className="form-control" placeholder="Search query" onChange={query => this.setState({query: query.target.value.toLowerCase()})}/>
+                                    <input type="text" className="form-control" placeholder="Search query" onChange={e => this.onQueryChange(e.target.value.toLowerCase())}/>
                                   </div>
                                 </li>
                               </ul>
                             </div>
-                            <AuditLogList logs={this.props.auditLog.filter(filterLogs(this.state.query)).filter(filterPagination(this.state.currentPage, this.props.config.entriesPerPage))}/>
+                            <AuditLogList logs={this.getLogs().filter(filterPagination(this.state.currentPage, this.props.config.entriesPerPage))}/>
                             <div className="pagination-wrapper">
-                              <Paginator pagesTotal={totalPages(this.props.auditLog.length, this.props.config.entriesPerPage)} currentPage={this.state.currentPage} onClick={page => this.setState({currentPage: page})}/>
+                              <Paginator pagesTotal={totalPages(this.getLogs().length, this.props.config.entriesPerPage)} currentPage={this.state.currentPage} onClick={page => this.setState({currentPage: page})}/>
                             </div>
                         </div>
                     </div>
