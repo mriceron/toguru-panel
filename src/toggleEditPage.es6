@@ -1,253 +1,248 @@
 import React from 'react'
 
-import { withRouter } from 'react-router'
-import { getToggle, createToggle, deleteToggle, updateToggle } from './state/actions.es6'
-import { ApiKeyModal } from './components/apiKeyModal.es6'
-import { Template } from './components/template.es6'
-import { ActionButton } from './components/actionButton.es6'
-import { connect } from 'react-redux'
+import {withRouter} from 'react-router'
+import {getToggle, createToggle, deleteToggle, updateToggle} from './state/actions.es6'
+import {Template} from './components/template.es6'
+import {connect} from 'react-redux'
+import {isStringAJson, parseJsonString} from './utils'
 
-const fromActivations = (toggle, block, defaultValue = {}) =>
-  toggle && toggle.activations && toggle.activations[0] && toggle.activations[0][block] || defaultValue
+const getTogglePercentage = toggle =>
+    toggle.activations[0] && toggle.activations[0].rollout && toggle.activations[0].rollout.percentage && parseInt(toggle.activations[0].rollout.percentage) || 0
 
-const changeActivations = (activations, blockName, newValue) => {
-  let newActivations = activations ? activations.slice() : []
+const getToggleAttributes = toggle =>
+    toggle.activations[0] && toggle.activations[0].attributes && JSON.stringify(toggle.activations[0].attributes) || ""
 
-  if(newActivations[0]) {
-    newActivations[0][blockName] = newValue
-  } else {
-    const newActivation = {}
-    newActivation[blockName] = newValue
-    newActivations = [newActivation]
-  }
-
-  return newActivations
+const defaultState = {
+    id: "",
+    name: "",
+    description: "",
+    percentage: 0,
+    attributes: "",
+    tags: "",
+    errors: new Set()
 }
 
-const jsonStringify = (maybeJson) => {
-  if(typeof maybeJson == "object") {
-    return JSON.stringify(maybeJson)
-  } else {
-    return maybeJson
-  }
+class ToggleEdit extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = defaultState
+
+        if(this.props.match.params.toggleId) {
+            this.props.dispatch(getToggle(this.props.match.params.toggleId))
+                .then(action => action.toggle)
+                .then(toggle => this.fillState)
+        }
+
+        this.handleDeleteAction = this.handleDeleteAction.bind(this)
+        this.handleInputChange = this.handleInputChange.bind(this)
+        this.handleFormSubmit = this.handleFormSubmit.bind(this)
+    }
+
+    componentWillReceiveProps(newProps) {
+        this.fillState(newProps.toggles[newProps.match.params.toggleId])
+    }
+
+    fillState(toggle) {
+        if(toggle) {
+            this.setState({
+                id: toggle.id,
+                name: toggle.name,
+                description: toggle.description,
+                percentage: getTogglePercentage(toggle),
+                attributes: getToggleAttributes(toggle),
+                tags: JSON.stringify(toggle.tags)
+            })
+        } else {
+            this.setState(defaultState)
+        }
+    }
+
+    handleInputChange(event) {
+        const target = event.target
+        const value = target.type === 'checkbox' ? target.checked :
+            (target.type === 'number' ? parseInt(target.value) : target.value)
+        const name = target.name
+
+        this.setState({
+            [name]: value,
+            saved: undefined
+        })
+    }
+
+    handleDeleteAction(event) {
+        event.preventDefault()
+        this.props.dispatch(deleteToggle(this.state.id))
+            .then(_ => this.props.history.push('/'))
+    }
+
+    checkForErrors() {
+        const errors = new Set()
+        if(this.state.id) {
+            if(!Number.isInteger(this.state.percentage) || this.state.percentage < 0 || this.state.percentage > 100) errors.add("percentage")
+            if(!isStringAJson(this.state.attributes) && this.state.attributes !== "") errors.add("attributes")
+        } else {
+            if(!this.state.name) errors.add("name")
+            if(!this.state.description) errors.add("description")
+            if(!isStringAJson(this.state.tags)) errors.add("tags")
+        }
+
+        return errors
+    }
+
+    handleFormSubmit(event) {
+        event.preventDefault()
+        const errors = this.checkForErrors()
+        this.setState({errors})
+
+        if(errors.size === 0) {
+            const toggle = Object.assign({}, this.state, {
+                tags: parseJsonString(this.state.tags),
+                attributes: parseJsonString(this.state.attributes)
+            })
+
+            if(this.state.id) {
+                this.props.dispatch(updateToggle(toggle))
+                    .then(_ => this.setState({saved: true}))
+            } else {
+                this.props.dispatch(createToggle(toggle))
+                    .then(toggleId => this.props.history.push('/edit/' + toggleId))
+            }
+        }
+    }
+
+    render() {
+        return (
+            <Template pageName='toggles'>
+                <div className="container-fluid">
+                    <div className="row">
+                        <div className="col-md-8">
+                            <div className="card">
+                                <div className="header">
+                                    <h4 className="title">{this.state.id ? "Edit Toggle" : "Create Toggle"}</h4>
+                                </div>
+                                <div className="content">
+                                    <form onSubmit={this.handleFormSubmit}>
+                                        <div className="row">
+                                            <div className="col-md-5">
+                                                <div className="form-group">
+                                                    <label
+                                                        className={this.state.errors.has("id") ? "error" : undefined}>Toggle
+                                                        ID</label>
+                                                    <input type="text" className="form-control" disabled
+                                                           placeholder="my-toggle-id" value={this.state.id}/>
+                                                </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                                <div className="form-group">
+                                                    <label
+                                                        className={this.state.errors.has("name") ? "error" : undefined}>Name</label>
+                                                    <input type="text" name="name" className="form-control"
+                                                           placeholder="Toggle name"
+                                                           disabled={this.state.id ? "true" : undefined}
+                                                           value={this.state.name} onChange={this.handleInputChange}/>
+                                                </div>
+                                            </div>
+                                            <div className="col-md-3">
+                                                <div className="form-group">
+                                                    <label
+                                                        className={this.state.errors.has("percentage") ? "error" : undefined}>Rollout
+                                                        percentage</label>
+                                                    <input type="number" name="percentage"
+                                                           disabled={!this.state.id ? "true" : undefined}
+                                                           className="form-control" placeholder="0"
+                                                           value={this.state.percentage}
+                                                           onChange={this.handleInputChange}/>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="col-md-12">
+                                                <div className="form-group">
+                                                    <label
+                                                        className={this.state.errors.has("description") ? "error" : undefined}>Description</label>
+                                                    <input type="text" name="description" className="form-control"
+                                                           placeholder="Description"
+                                                           disabled={this.state.id ? "true" : undefined}
+                                                           value={this.state.description}
+                                                           onChange={this.handleInputChange}/>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="col-md-12">
+                                                <div className="form-group">
+                                                    <label
+                                                        className={this.state.errors.has("attributes") ? "error" : undefined}>Attributes
+                                                        JSON</label>
+                                                    <textarea rows="5" name="attributes" className="form-control"
+                                                              disabled={!this.state.id ? "true" : undefined}
+                                                              placeholder='{ "culture": [ "de-DE", "DE" ] }'
+                                                              value={this.state.attributes}
+                                                              onChange={this.handleInputChange}/>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="col-md-12">
+                                                <div className="form-group">
+                                                    <label
+                                                        className={this.state.errors.has("tags") ? "error" : undefined}>Tags
+                                                        JSON</label>
+                                                    <textarea rows="5" name="tags" className="form-control"
+                                                              placeholder='{ "team": "Toguru team" }'
+                                                              disabled={this.state.id ? "true" : undefined}
+                                                              value={this.state.tags}
+                                                              onChange={this.handleInputChange}/>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {this.state.saved ?
+                                            <button type="submit" className="btn btn-fill pull-right btn-success">Saved!</button> :
+                                            <button type="submit" className="btn btn-fill pull-right btn-info">Save</button>
+                                        }
+
+                                        <button type="submit" className="btn btn-fill pull-right btn-danger delete-toggle" onClick={this.handleDeleteAction}>Delete</button>
+                                        <div className="clearfix"></div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        {false && this.state.toggleId ? ActionsComponent : undefined }
+                    </div>
+                </div>
+            </Template>
+        )
+    }
 }
 
-const validateToggle = toggle => {
-  const errors = new Set()
-  if(!toggle.name) errors.add("name")
-  if(!toggle.description) errors.add("description")
-  if(!toggle.tags) errors.add("tags")
-
-  return errors
+const ActionsComponent = () => {
+    <div className="col-md-4">
+        <div className="card">
+            <div className="header">
+                <h4 className="title">Actions</h4>
+            </div>
+            <div className="content">
+                <div className="row">
+                    <div className="col-md-12">
+                        <div className="form-group">
+                            <label>Local override</label>
+                            <select className="form-control">
+                                <option>Do not override</option>
+                                <option>Always enabled</option>
+                                <option>Always disabled</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
 export const ToggleEditPage =
-  withRouter(connect(state => state)(
-    React.createClass({
-      getInitialState() {
-        return {
-          toggleId: null,
-          toggle: {},
-          oldToggle: {},
-          errors: new Set()
-        }
-      },
-      componentDidMount() {
-        if(this.props.match.params.toggleId) {
-          this.initToggle(this.props.match.params.toggleId)
-        }
-      },
-      componentWillReceiveProps(nextProps) {
-        if(this.state.toggleId != nextProps.match.params.toggleId) {
-          this.initToggle(nextProps.match.params.toggleId)
-        }
-      },
-      initToggle(toggleId) {
-        this.setState({toggleId: toggleId})
-        if(toggleId) {
-          this.props.dispatch(getToggle(toggleId))
-            .then(_ => this.setState({
-              oldToggle: this.props.toggles[toggleId],
-              toggle: this.props.toggles[toggleId]
-            }))
-        }
-      },
-      changeToggle(fieldName, mapFunc = v => v) {
-        return (e) => {
-          const changedField = {}
-          changedField[fieldName] = mapFunc(e.target.value)
-          this.setState({toggle: Object.assign({}, this.state.toggle, changedField)})
-        }
-      },
-      changeToggleActivation(activationName, mapFunc = v => v) {
-        return (e) => {
-          const newActivations = changeActivations(this.state.toggle.activations || [], activationName, mapFunc(e.target.value))
-          this.setState({toggle: Object.assign({}, this.state.toggle, {activations: newActivations})})
-        }
-      },
-      setError(field) {
-        const errors = this.state.errors
-        errors.add(field)
-        this.setState({errors})
-      },
-      dropError(field) {
-        const errors = this.state.errors
-        errors.delete(field)
-        this.setState({errors})
-      },
-      parseJson(field) {
-        return (value) => {
-          try {
-            const parsedJson = JSON.parse(value)
-            this.dropError(field)
-            return parsedJson
-          } catch(err) {
-            this.setError(field)
-            return value
-          }
-        }
-      },
-      parsePercentage(value) {
-        if(value > 100 || value < 0) {
-          this.setError("percentage")
-        } else {
-          this.dropError("percentage")
-        }
-
-        return {percentage: parseInt(value)}
-      },
-      checkRequired(field, value) {
-        if(value != "") {
-          this.dropError(field)
-          return true
-        } else {
-          this.setError(field)
-          return false
-        }
-      },
-      checkMandatoryField() {
-        return false
-      },
-      validateAndCreateToggle(e) {
-        e.preventDefault()
-        const errors = validateToggle(this.state.toggle)
-        if(errors.size > 0) {
-          this.setState({errors})
-          return false
-        }
-
-        this.props.dispatch(createToggle(this.state.toggle))
-          .then(action => this.props.history.push('/edit/' + action.toggle.id))
-      },
-      deleteButtonClick(e) {
-        e.preventDefault()
-        this.props.dispatch(deleteToggle(this.state.toggle.id))
-          .then(_ => this.props.history.push('/'))
-      },
-      updateToggleClick(e) {
-        e.preventDefault()
-        this.props.dispatch(updateToggle(this.state.toggle))
-      },
-      render() {
-        return (
-          <Template pageName='toggles'>
-            <div className="container-fluid">
-                <div className="row">
-                  <div className="col-md-8">
-                      <div className="card">
-                          <div className="header">
-                              <h4 className="title">{this.state.toggleId ? "Edit Toggle" : "Create Toggle"}</h4>
-                          </div>
-                          <div className="content">
-                              <form>
-                                  <div className="row">
-                                      <div className="col-md-5">
-                                          <div className="form-group">
-                                              <label className={this.state.errors.has("id") ? "error" : undefined}>Toggle ID</label>
-                                              <input type="text" className="form-control" disabled placeholder="my-toggle-id" value={this.state.toggle && this.state.toggle.id || ""}/>
-                                          </div>
-                                      </div>
-                                      <div className="col-md-4">
-                                          <div className="form-group">
-                                              <label className={this.state.errors.has("name") ? "error" : undefined}>Name</label>
-                                              <input type="text" name="name" className="form-control" placeholder="Toggle name" disabled={this.state.toggleId ? "true" : undefined} value={this.state.toggle && this.state.toggle.name || ""} onChange={this.changeToggle("name")}/>
-                                          </div>
-                                      </div>
-                                      <div className="col-md-3">
-                                          <div className="form-group">
-                                              <label className={this.state.errors.has("percentage") ? "error" : undefined}>Rollout percentage</label>
-                                              <input type="number" name="activations.rollout.percentage" disabled={!this.state.toggleId ? "true" : undefined} className="form-control" placeholder="0" value={fromActivations(this.state.toggle, "rollout").percentage || undefined} onChange={this.changeToggleActivation("rollout", this.parsePercentage)}/>
-                                          </div>
-                                      </div>
-                                  </div>
-
-                                  <div className="row">
-                                      <div className="col-md-12">
-                                          <div className="form-group">
-                                              <label className={this.state.errors.has("description") ? "error" : undefined}>Description</label>
-                                              <input type="text" name="description" className="form-control" placeholder="Description" disabled={this.state.toggleId ? "true" : undefined} value={this.state.toggle && this.state.toggle.description || ""} onChange={this.changeToggle("description")}/>
-                                          </div>
-                                      </div>
-                                  </div>
-
-                                  <div className="row">
-                                      <div className="col-md-12">
-                                          <div className="form-group">
-                                              <label className={this.state.errors.has("attributes") ? "error" : undefined}>Attributes JSON</label>
-                                              <textarea rows="5" name="activations.attributes" className="form-control" disabled={!this.state.toggleId ? "true" : undefined} placeholder='{ "culture": [ "de-DE", "DE" ] }' value={jsonStringify(fromActivations(this.state.toggle, "attributes", null) || undefined)} onChange={this.changeToggleActivation("attributes", this.parseJson("attributes"))}/>
-                                          </div>
-                                      </div>
-                                  </div>
-
-                                  <div className="row">
-                                      <div className="col-md-12">
-                                          <div className="form-group">
-                                              <label className={this.state.errors.has("tags") ? "error" : undefined}>Tags JSON</label>
-                                              <textarea rows="5" name="tags" className="form-control" placeholder='{ "team": "Toguru team" }' disabled={this.state.toggleId ? "true" : undefined} value={jsonStringify(this.state.toggle && this.state.toggle.tags || undefined)} onChange={this.changeToggle("tags", this.parseJson("tags"))}/>
-                                          </div>
-                                      </div>
-                                  </div>
-
-                                 {this.state.toggleId ?
-                                    <div>
-                                      <ActionButton className="btn btn-fill pull-right" onClick={this.updateToggleClick} completedText="Updated!">Update</ActionButton>
-                                      <ActionButton className="btn btn-fill pull-right delete-toggle" onClick={this.deleteButtonClick} colorClass="btn-danger">Delete</ActionButton>
-                                    </div> :
-                                    <ActionButton className="btn btn-fill pull-right" onClick={this.validateAndCreateToggle} completedText="Created!">Create</ActionButton>
-                                  }
-                                  <div className="clearfix"></div>
-                              </form>
-                          </div>
-                      </div>
-                  </div>
-
-                  {false && this.state.toggleId ?
-                    <div className="col-md-4">
-                      <div className="card">
-                          <div className="header">
-                              <h4 className="title">Actions</h4>
-                          </div>
-                          <div className="content">
-                            <div className="row">
-                                <div className="col-md-12">
-                                    <div className="form-group">
-                                        <label>Local override</label>
-                                        <select className="form-control">
-                                          <option>Do not override</option>
-                                          <option>Always enabled</option>
-                                          <option>Always disabled</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                          </div>
-                       </div>
-                    </div> : undefined }
-
-                </div>
-            </div>
-          </Template>
-        )
-      }
-    })
-  ))
+    withRouter(connect(s => s)(ToggleEdit))

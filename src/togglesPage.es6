@@ -25,7 +25,7 @@ const ToggleEntry = ({toggle}) => (
   <tr>
     <td><Link to={"/edit/" + toggle.id}>{toggle.id}</Link></td>
     <td>{generateRolloutBlock(toggle.rolloutPercentage)}</td>
-    <td>{objectToArray(toggle.tags).map(tag => <code className="tag" key={toggle.id + "-" + tag}>{tag}</code>)}</td>
+    <td>{objectToArray(toggle.tags).map((tag, index) => <code className="tag" key={toggle.id + "-" + tag + "-" + index}>{tag}</code>)}</td>
   </tr>
 )
 
