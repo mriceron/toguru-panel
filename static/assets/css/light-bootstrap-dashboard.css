@@ -3607,3 +3607,7 @@ body .extra-menu {
 .pagination-wrapper .pagination {
   margin: 11px 0;
 }
+
+.form-control:not([disabled]):not([type="submit"]) {
+  border: 1px solid #999;
+}
