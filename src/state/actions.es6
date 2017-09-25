@@ -48,28 +48,25 @@ export const deleteToggle = toggleId => (dispatch, getState) =>
         .then(dispatch)
         .catch(openApiKeyAlertOnUnauthorized(dispatch, _ => deleteToggle(toggleId)))
 
-export const updateToggle = toggle => dispatch => {
-    if (toggle.percentage == 0) {
-        return dispatch(disableToggleActivation(toggle))
-    } else {
-        return dispatch(updateToggleActivation(toggle))
-    }
-}
+export const updateToggle = toggle => dispatch =>
+    dispatch(updateToggleActivation(toggle))
 
-const updateToggleActivation = toggle => (dispatch, getState) =>
-    fetch(apiUrl(getState) + '/toggle/' + toggle.id + "/activations/0", {
+const updateToggleActivation = toggle => (dispatch, getState) => {
+    const body = {}
+    body['attributes'] = toggle.attributes
+    if (toggle.percentage !== 0) {
+        body['rollout'] = { percentage: toggle.percentage }
+    }
+
+    return fetch(apiUrl(getState) + '/toggle/' + toggle.id + "/activations/0", {
         method: 'PUT',
         headers: withApiKeyHeader(getState()),
-        body: JSON.stringify({
-            attributes: toggle.attributes,
-            rollout: {
-                percentage: toggle.percentage
-            }
-        })
+        body: JSON.stringify(body)
     }).then(parseJson)
         .then(checkToguruResponse(_ => toggle))
         .then(_ => dispatch(getToggle(toggle.id)))
         .catch(openApiKeyAlertOnUnauthorized(dispatch, _ => updateToggleActivation(toggle)))
+}
 
 const disableToggleActivation = toggle => (dispatch, getState) =>
     fetch(apiUrl(getState) + '/toggle/' + toggle.id + "/activations/0", {
