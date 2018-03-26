@@ -107,7 +107,7 @@ export const AuditLogPage =
                               <ul className="search-panel">
                                 <li>
                                   <h4 className="title">History log</h4>
-                                  <a className="black">We know everything about you, dude</a>
+                                  <a className="black">We know everything about you, folks</a>
                                 </li>
                                 <li className="with-margin">
                                   <div className="form-group">
