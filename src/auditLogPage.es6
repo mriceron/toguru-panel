@@ -8,27 +8,27 @@ import { Link } from 'react-router'
 import { ApiKeyModal } from './components/apiKeyModal.es6'
 import Moment from 'react-moment'
 
-const AuditLogList = ({logs}) => (
+const AuditLogList = ({ logs }) => (
   <div className="content table-responsive table-full-width no-padding-bottom">
-      <table className="table table-hover table-striped toggles-table no-padding-bottom">
-          <thead>
-            <tr>
-              <th>Toggle ID</th>
-              <th>Event</th>
-              <th>Delta</th>
-              <th>Time</th>
-              <th>User</th>
-            </tr>
-          </thead>
-          <tbody>
-              {logs.map(t => <AuditLogEntry log={t} key={t.id + "-" + t.meta.epoch}/>)}
-          </tbody>
-      </table>
-      <hr className="no-padding"/>
+    <table className="table table-hover table-striped toggles-table no-padding-bottom">
+      <thead>
+        <tr>
+          <th>Toggle ID</th>
+          <th>Event</th>
+          <th>Delta</th>
+          <th>Time</th>
+          <th>User</th>
+        </tr>
+      </thead>
+      <tbody>
+        {logs.map(t => <AuditLogEntry log={t} key={t.id + "-" + t.meta.epoch} />)}
+      </tbody>
+    </table>
+    <hr className="no-padding" />
   </div>
 )
 
-const AuditLogEntry = ({log}) => (
+const AuditLogEntry = ({ log }) => (
   <tr>
     <td>{log.id}</td>
     <td>{matchEvent(log.event)}</td>
@@ -67,9 +67,9 @@ const isStartsWith = (string, query) =>
   string.toLowerCase().startsWith(query)
 
 const filterLogs = (query) => (log) => {
-  if(!query) return true;
+  if (!query) return true;
   return isStringContainsQuery(log.id, query) ||
-         isStartsWith(log.meta.user, query)
+    isStartsWith(log.meta.user, query)
 }
 
 export const AuditLogPage =
@@ -86,11 +86,11 @@ export const AuditLogPage =
         this.props.dispatch(getAuditLog())
       },
       onQueryChange(query) {
-        if(query) {
+        if (query) {
           const filteredLogs = this.props.auditLog.filter(filterLogs(this.state.query))
-          this.setState({query, currentPage: 1, filteredLogs})
+          this.setState({ query, currentPage: 1, filteredLogs })
         } else {
-          this.setState({query, currentPage: 1, filteredLogs: []})
+          this.setState({ query, currentPage: 1, filteredLogs: [] })
         }
       },
       getLogs() {
@@ -100,29 +100,29 @@ export const AuditLogPage =
         return (
           <Template pageName='history'>
             <div className="container-fluid">
-                <div className="row">
-                    <div className="col-md-12">
-                        <div className="card">
-                            <div className="header">
-                              <ul className="search-panel">
-                                <li>
-                                  <h4 className="title">History log</h4>
-                                  <a className="black">We know everything about you, folks</a>
-                                </li>
-                                <li className="with-margin">
-                                  <div className="form-group">
-                                    <input type="text" className="form-control" placeholder="Search query" onChange={e => this.onQueryChange(e.target.value.toLowerCase())}/>
-                                  </div>
-                                </li>
-                              </ul>
-                            </div>
-                            <AuditLogList logs={this.getLogs().filter(paginationFilter(this.state.currentPage, this.props.config.entriesPerPage))}/>
-                            <div className="pagination-wrapper">
-                              <Paginator totalEntries={this.getLogs().length} perPage={this.props.config.entriesPerPage} currentPage={this.state.currentPage} onClick={page => this.setState({currentPage: page})}/>
-                            </div>
-                        </div>
+              <div className="row">
+                <div className="col-md-12">
+                  <div className="card">
+                    <div className="header">
+                      <ul className="search-panel">
+                        <li>
+                          <h4 className="title">History log</h4>
+                          <a className="black">We know everything about you, folks</a>
+                        </li>
+                        <li className="with-margin">
+                          <div className="form-group">
+                            <input type="text" className="form-control" placeholder="Search query" onKeyUp={e => this.onQueryChange(e.target.value.toLowerCase())} />
+                          </div>
+                        </li>
+                      </ul>
                     </div>
+                    <AuditLogList logs={this.getLogs().filter(paginationFilter(this.state.currentPage, this.props.config.entriesPerPage))} />
+                    <div className="pagination-wrapper">
+                      <Paginator totalEntries={this.getLogs().length} perPage={this.props.config.entriesPerPage} currentPage={this.state.currentPage} onClick={page => this.setState({ currentPage: page })} />
+                    </div>
+                  </div>
                 </div>
+              </div>
             </div>
           </Template>
         )
