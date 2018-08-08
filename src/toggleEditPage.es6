@@ -97,7 +97,8 @@ class ToggleEdit extends React.Component {
         if(errors.size === 0) {
             const toggle = Object.assign({}, this.state, {
                 tags: parseJsonString(this.state.tags),
-                attributes: parseJsonString(this.state.attributes)
+                attributes: parseJsonString(this.state.attributes),
+                description: this.state.description
             })
 
             if(this.state.id) {
@@ -163,7 +164,7 @@ class ToggleEdit extends React.Component {
                                                         className={this.state.errors.has("description") ? "error" : undefined}>Description</label>
                                                     <input type="text" name="description" className="form-control"
                                                            placeholder="Description"
-                                                           disabled={this.state.id ? "true" : undefined}
+                                                           disabled={!this.state.id ? "true" : undefined}
                                                            value={this.state.description}
                                                            onChange={this.handleInputChange}/>
                                                 </div>
@@ -193,7 +194,7 @@ class ToggleEdit extends React.Component {
                                                         JSON</label>
                                                     <textarea rows="5" name="tags" className="form-control"
                                                               placeholder='{ "team": "Toguru team" }'
-                                                              disabled={this.state.id ? "true" : undefined}
+                                                              disabled={!this.state.id ? "true" : undefined}
                                                               value={this.state.tags}
                                                               onChange={this.handleInputChange}/>
                                                 </div>

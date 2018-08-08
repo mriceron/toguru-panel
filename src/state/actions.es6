@@ -54,11 +54,13 @@ export const updateToggle = toggle => dispatch =>
 const updateToggleActivation = toggle => (dispatch, getState) => {
     const body = {}
     body['attributes'] = toggle.attributes
+    body['description'] = toggle.description
+    body['tags'] = toggle.tags
     if (toggle.percentage !== 0) {
         body['rollout'] = { percentage: toggle.percentage }
     }
 
-    return fetch(apiUrl(getState) + '/toggle/' + toggle.id + "/activations/0", {
+    return fetch(apiUrl(getState) + '/toggle/' + toggle.id, {
         method: 'PUT',
         headers: withApiKeyHeader(getState()),
         body: JSON.stringify(body)
