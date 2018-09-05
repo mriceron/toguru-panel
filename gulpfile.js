@@ -31,11 +31,13 @@ gulp.task('copy:statics', () => {
 
 gulp.task('build:config', () => {
     const enviroment = gutil.env.env
+    const apiUrl = gutil.env.apiUrl
     console.log(`Enviroment => ${enviroment}`)
+    if(apiUrl) console.log(`apiUrl => ${apiUrl}`)
     let config = require('./src/conf/baseConfig.json')
     if( enviroment === "dev"){
         const devConfig = require('./src/conf/devConfig.json')
-        config = Object.assign({}, config, devConfig)
+        config = Object.assign({}, config, devConfig, { apiUrl: apiUrl || devConfig.apiUrl })
     }
     
     return newFile("config.json", JSON.stringify(config))
