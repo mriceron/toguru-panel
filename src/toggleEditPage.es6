@@ -1,7 +1,7 @@
 import React from 'react'
-
+import { Link } from 'react-router-dom'
 import {withRouter} from 'react-router'
-import {getToggle, createToggle, deleteToggle, updateToggle} from './state/actions.es6'
+import {getToggle, createToggle, deleteToggle, updateToggle, openApiKeyAlertOnUnauthorized} from './state/actions.es6'
 import {Template} from './components/template.es6'
 import {connect} from 'react-redux'
 import {isStringAJson, parseJsonString} from './utils'
@@ -12,20 +12,21 @@ const getTogglePercentage = toggle =>
 const getToggleAttributes = toggle =>
     toggle.activations[0] && toggle.activations[0].attributes && JSON.stringify(toggle.activations[0].attributes) || ""
 
-const defaultState = {
+const defaultState = (isNewToggle) => ({
     id: "",
     name: "",
     description: "",
     percentage: 0,
     attributes: "",
     tags: "",
-    errors: new Set()
-}
+    errors: new Set(),
+    isNewToggle
+})
 
 class ToggleEdit extends React.Component {
     constructor(props) {
         super(props)
-        this.state = defaultState
+        this.state = defaultState(props.isNewToggle)
 
         if(this.props.match.params.toggleId) {
             this.props.dispatch(getToggle(this.props.match.params.toggleId))
@@ -43,6 +44,7 @@ class ToggleEdit extends React.Component {
     }
 
     fillState(toggle) {
+        console.log(toggle)
         if(toggle) {
             this.setState({
                 id: toggle.id,
@@ -50,10 +52,11 @@ class ToggleEdit extends React.Component {
                 description: toggle.description,
                 percentage: getTogglePercentage(toggle),
                 attributes: getToggleAttributes(toggle),
-                tags: JSON.stringify(toggle.tags)
+                tags: JSON.stringify(toggle.tags),
+                isNewToggle: false,
             })
         } else {
-            this.setState(defaultState)
+            this.setState(defaultState(true))
         }
     }
 
@@ -94,7 +97,7 @@ class ToggleEdit extends React.Component {
         const errors = this.checkForErrors()
         this.setState({errors})
 
-        if(errors.size === 0) {
+        if(errors.size === 0 && !this.state.saved) {
             const toggle = Object.assign({}, this.state, {
                 tags: parseJsonString(this.state.tags),
                 attributes: parseJsonString(this.state.attributes)
@@ -103,6 +106,25 @@ class ToggleEdit extends React.Component {
             if(this.state.id) {
                 this.props.dispatch(updateToggle(toggle))
                     .then(_ => this.setState({saved: true}))
+                    .catch(e => {
+                        console.log(e)
+                        switch(e.type){
+                            case "ACTIVATION_ATTRIBUTES": {
+                                this.setState({ 
+                                    errors: new Set(["percentage", "attributes"])
+                                })
+                            }
+                            break;
+                            case "TAGS_DESC": {
+                                this.setState({ 
+                                    errors: new Set(["tags", "description"])
+                                })
+                            }
+                            break;
+                        }
+                        openApiKeyAlertOnUnauthorized(this.props.dispatch, _ => updateToggleActivation(toggle))
+                    })
+                    .then(() => this.props.dispatch(getToggle(toggle.id)))
             } else {
                 this.props.dispatch(createToggle(toggle))
                     .then(toggleId => this.props.history.push('/edit/' + toggleId))
@@ -163,7 +185,6 @@ class ToggleEdit extends React.Component {
                                                         className={this.state.errors.has("description") ? "error" : undefined}>Description</label>
                                                     <input type="text" name="description" className="form-control"
                                                            placeholder="Description"
-                                                           disabled={this.state.id ? "true" : undefined}
                                                            value={this.state.description}
                                                            onChange={this.handleInputChange}/>
                                                 </div>
@@ -193,7 +214,6 @@ class ToggleEdit extends React.Component {
                                                         JSON</label>
                                                     <textarea rows="5" name="tags" className="form-control"
                                                               placeholder='{ "team": "Toguru team" }'
-                                                              disabled={this.state.id ? "true" : undefined}
                                                               value={this.state.tags}
                                                               onChange={this.handleInputChange}/>
                                                 </div>
@@ -201,7 +221,9 @@ class ToggleEdit extends React.Component {
                                         </div>
 
                                         {this.state.saved ?
-                                            <button type="submit" className="btn btn-fill pull-right btn-success">Saved!</button> :
+                                            <button type="submit" className="btn btn-fill pull-right btn-success">
+                                                <Link to={"/"}>Saved!</Link>
+                                            </button> :
                                             <button type="submit" className="btn btn-fill pull-right btn-info">Save</button>
                                         }
 

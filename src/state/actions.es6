@@ -48,8 +48,13 @@ export const deleteToggle = toggleId => (dispatch, getState) =>
         .then(dispatch)
         .catch(openApiKeyAlertOnUnauthorized(dispatch, _ => deleteToggle(toggleId)))
 
-export const updateToggle = toggle => dispatch =>
+export const updateToggle = toggle => (dispatch, getState) =>
     dispatch(updateToggleActivation(toggle))
+        .catch(e => { throw { type: "ACTIVATION_ATTRIBUTES", error: e } })
+        .then(() => 
+            dispatch(updateToggleTagsAndDesc(toggle))
+                .catch(e => { throw { type: "TAGS_DESC", error: e } })
+        )
 
 const updateToggleActivation = toggle => (dispatch, getState) => {
     const body = {}
@@ -64,8 +69,18 @@ const updateToggleActivation = toggle => (dispatch, getState) => {
         body: JSON.stringify(body)
     }).then(parseJson)
         .then(checkToguruResponse(_ => toggle))
-        .then(_ => dispatch(getToggle(toggle.id)))
-        .catch(openApiKeyAlertOnUnauthorized(dispatch, _ => updateToggleActivation(toggle)))
+}
+
+const updateToggleTagsAndDesc = toggle => (dispatch, getState) => {
+    const body = {}
+    body['description'] = toggle.description
+    body['tags'] = toggle.tags
+    return fetch(apiUrl(getState) + '/toggle/' + toggle.id, {
+        method: 'PUT',
+        headers: withApiKeyHeader(getState()),
+        body: JSON.stringify(body)
+    }).then(parseJson)
+        .then(checkToguruResponse(_ => toggle))
 }
 
 const disableToggleActivation = toggle => (dispatch, getState) =>
@@ -77,7 +92,7 @@ const disableToggleActivation = toggle => (dispatch, getState) =>
         .then(dispatch)
         .catch(openApiKeyAlertOnUnauthorized(dispatch, _ => disableToggleActivation(toggle)))
 
-const openApiKeyAlertOnUnauthorized = (dispatch, action) => response =>
+export const openApiKeyAlertOnUnauthorized = (dispatch, action) => response =>
     onUnauthorized(_ => dispatch(showApiKeyAlert(action)))(response)
 
 const checkToguruResponse = onSuccess => response => {
@@ -88,5 +103,10 @@ const checkToguruResponse = onSuccess => response => {
     }
 }
 
-const withApiKeyHeader = state => ({Authorization: "api-key " + state.apiKey})
+const withApiKeyHeader = state => {
+    if(state.config.auth) 
+        return {Authorization: "api-key " + state.apiKey}
+    else 
+        return {}
+}
 const apiUrl = getState => getState().config.apiUrl

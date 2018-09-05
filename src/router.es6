@@ -31,7 +31,7 @@ const RouteSwitch = () => (
   <Switch>
     <Route exact path="/" component={TogglesPage}/>
     <Route path="/edit/:toggleId" component={ToggleEditPage}/>
-    <Route path="/create" component={ToggleEditPage}/>
+    <Route path="/create" render={(props) => <ToggleEditPage {...props} isNewToggle={true} />}/>
     <Route path="/history" component={AuditLogPage}/>
     <Route path="*" component={TogglesPage}/>
   </Switch>
