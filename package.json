@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "gulp": "node ./node_modules/gulp/bin/gulp.js"
+    "gulp": "node ./node_modules/gulp/bin/gulp.js",
+    "dev": "node ./node_modules/gulp/bin/gulp.js --env 'dev'"
   },
   "repository": {
     "type": "git",

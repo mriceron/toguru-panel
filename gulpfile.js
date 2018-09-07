@@ -30,10 +30,18 @@ gulp.task('copy:statics', () => {
 })
 
 gulp.task('build:config', () => {
-  const defaultApiUrl = 'https://toguru.autoscout24.com'
-  gulp.src('./dist/config.json')
-      .pipe(replace(defaultApiUrl, argv.apiUrl || defaultApiUrl))
-      .pipe(gulp.dest('./dist'))
+    const enviroment = gutil.env.env
+    const apiUrl = gutil.env.apiUrl
+    console.log(`Enviroment => ${enviroment}`)
+    if(apiUrl) console.log(`apiUrl => ${apiUrl}`)
+    let config = require('./src/conf/baseConfig.json')
+    if( enviroment === "dev"){
+        const devConfig = require('./src/conf/devConfig.json')
+        config = Object.assign({}, config, devConfig, { apiUrl: apiUrl || devConfig.apiUrl })
+    }
+    
+    return newFile("config.json", JSON.stringify(config))
+                .pipe(gulp.dest("./dist"));
 })
 
 gulp.task('build:css', () => {
@@ -80,7 +88,7 @@ gulp.task('dist:development', callback =>
 
 gulp.task('dist:production', callback => {
   process.env.NODE_ENV = 'production'
-  return runSequence('clean', 'copy:statics', 'build:css', 'clean:css', 'build:es6', 'uglify:js', callback)
+  return runSequence('clean', 'copy:statics', 'build:config', 'build:css', 'clean:css', 'build:es6', 'uglify:js', callback)
 })
 
 gulp.task('watch', ['dist:development'], () => {
@@ -97,5 +105,17 @@ gulp.task('serve', () => {
       host: '0.0.0.0',
     }))
 })
+
+// http://www.tonylunt.com/gulp/transforming-json-config-files-with-gulp/
+function newFile(name, contents) {
+    //uses the node stream object
+    const readableStream = require('stream').Readable({ objectMode: true });
+    //reads in our contents string
+    readableStream._read = function () {
+        this.push(new gutil.File({ cwd: "", base: "", path: name, contents: new Buffer.from(contents) }));
+        this.push(null);
+    }
+    return readableStream;
+};
 
 gulp.task('default', ['watch', 'serve'])

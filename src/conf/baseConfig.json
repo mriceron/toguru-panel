@@ -1,6 +1,7 @@
-var config = {
+{
   "apiUrl": "https://toguru.autoscout24.com",
   "slackLink": "slack://channel?id={CHANNEL_ID}&team={TEAM_ID}",
   "hashRouting": true,
-  "entriesPerPage": 20
-};
+  "entriesPerPage": 20,
+  "auth" : true
+}

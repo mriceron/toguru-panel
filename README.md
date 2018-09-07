@@ -7,21 +7,23 @@ Webpanel for managing [Toguru](https://github.com/AutoScout24/toguru) toggles.
 Download last version (1.1.7) of toguru-panel [here](https://github.com/AutoScout24/toguru-panel/releases/download/1.1.7/toguru-panel.zip), configure it and run! 
 
 ### Configuration
-In `config.json` file you can configure toguru-panel for your own purposes.
+In `baseConfig.json` file you can configure toguru-panel for your own purposes.
 - `apiUrl` - link to your Toguru service instance
 - `slackLink` (optional) - Link on your Slack channel for support. To find out team id please use this [team.info API](https://api.slack.com/methods/team.info) and for channel id use this [channels.list API](https://api.slack.com/methods/channels.list)
 - `hashRouting` (optional, true/false) - enable hash routing for cases when toguru-panel must be served from filesystem
 - `entriesPerPage` (optional) - configure how much entries must be per one page of list.
 
 ### Build
-If you want to build your distributive of toguru-panel manually, you might have preinstalled [NodeJS](https://nodejs.org/) and [Gulp](http://gulpjs.com/).  
-To run production build, use: `gulp dist:production`.
+If you want to build your distributive of toguru-panel manually, you might have preinstalled [NodeJS](https://nodejs.org/), [Yarn](https://yarnpkg.com/) and [Gulp](http://gulpjs.com/).  
+To run production build, use: `yarn gulp dist:production`.
 
 ### Development
-If you want to develop toguru-panel, use default gulp task. It will serve application with watches and fast development builds.
+If you want to develop toguru-panel, use `yarn dev`.
+It will serve application with watches and fast development builds.
+During development [Toguru](https://github.com/Scout24/toguru) needs to be running locally since the default apiUrl is `localhost:9000`.
 
-To override default api url for development, please use --apiUrl parameter.  
-`gulp --apiUrl https://toguru.autoscout24.com`.
+To override the default api url for development, please use --apiUrl parameter.  
+`yarn dev --apiUrl https://toguru.autoscout24.com`.
 
 ### Docker
 

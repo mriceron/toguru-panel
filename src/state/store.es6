@@ -1,8 +1,9 @@
 import {createStore, applyMiddleware, compose} from 'redux'
 import thunk from 'redux-thunk'
 import DevTools from '../components/devTools';
-
 import {arrayToObject} from './../utils.es6'
+
+import config from '../../dist/config.json'
 
 const SET_TOGGLES = 'SET_TOGGLES'
 const SET_TOGGLE = 'SET_TOGGLE'
@@ -16,7 +17,7 @@ const DISABLE_TOGGLE = 'DISABLE_TOGGLE'
 const API_KEY = 'API_KEY'
 
 const defaultState = {
-    config: config,
+    config,
     toggles: {},
     auditLog: [],
     apiKey: localStorage.getItem(API_KEY),
