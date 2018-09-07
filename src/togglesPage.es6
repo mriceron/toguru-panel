@@ -80,9 +80,7 @@ export const TogglesPage =
         }
       },
       componentDidMount() {
-        if (this.props.toggles.length == 0) {
-          this.fetchList()
-        }
+        this.fetchList()
       },
       fetchList() {
         this.setState({ fetchStatus: "loading" })

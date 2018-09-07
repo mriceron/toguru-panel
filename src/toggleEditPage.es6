@@ -44,7 +44,6 @@ class ToggleEdit extends React.Component {
     }
 
     fillState(toggle) {
-        console.log(toggle)
         if(toggle) {
             this.setState({
                 id: toggle.id,
@@ -107,7 +106,6 @@ class ToggleEdit extends React.Component {
                 this.props.dispatch(updateToggle(toggle))
                     .then(_ => this.setState({saved: true}))
                     .catch(e => {
-                        console.log(e)
                         switch(e.type){
                             case "ACTIVATION_ATTRIBUTES": {
                                 this.setState({ 
